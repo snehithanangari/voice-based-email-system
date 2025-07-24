@@ -1,0 +1,6 @@
+Flask==2.3.2
+SpeechRecognition==3.10.0
+gTTS==2.5.1
+pyglet==2.0.10
+beautifulsoup4==4.12.2
+

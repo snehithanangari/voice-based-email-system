@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Compose Email</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            background-image: url('/static/images/bg-compose.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .container {
+            background-color: rgba(0,0,0,0.6);
+            max-width: 600px;
+            margin: 80px auto;
+            padding: 30px;
+            border-radius: 12px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 15px;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 5px;
+            border: none;
+        }
+        button, .btn {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 18px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .btn {
+            background-color: #007bff;
+            text-decoration: none;
+            margin-left: 10px;
+        }
+        .mic-btn {
+            margin-left: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Compose New Email</h2>
+        <form method="POST" id="composeForm">
+            <label>To:</label>
+            <input type="email" name="to" id="to" required>
+            <button type="button" onclick="startDictation('to')" class="mic-btn">🎤</button>
+
+            <label>Subject:</label>
+            <input type="text" name="subject" id="subject" required>
+            <button type="button" onclick="startDictation('subject')" class="mic-btn">🎤</button>
+
+            <label>Message:</label>
+            <textarea name="body" rows="6" id="body" required></textarea>
+            <button type="button" onclick="startDictation('body')" class="mic-btn">🎤</button>
+
+            <button type="submit">Send</button>
+            <a href="{{ url_for('dashboard') }}" class="btn">⬅ Back</a>
+        </form>
+    </div>
+
+    <script>
+        function startDictation(fieldId) {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'en-US';
+            recognition.interimResults = false;
+
+            recognition.onresult = function(event) {
+                document.getElementById(fieldId).value = event.results[0][0].transcript;
+            };
+
+            recognition.onerror = function(event) {
+                alert("Speech recognition error: " + event.error);
+            };
+
+            recognition.start();
+        }
+
+        // Global voice command: say "send" to submit the form
+        window.onload = function () {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.continuous = true;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            recognition.onresult = function (event) {
+                const command = event.results[event.results.length - 1][0].transcript.toLowerCase();
+                console.log("Voice command heard:", command);
+
+                if (command.includes("send")) {
+                    document.getElementById("composeForm").requestSubmit();
+                }
+            };
+
+            recognition.start();
+        };
+    </script>
+</body>
+</html>

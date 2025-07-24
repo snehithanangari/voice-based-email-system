@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            background-image: url('/static/images/bg-dashboard.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+        }
+        .container {
+            background-color: rgba(0,0,0,0.6);
+            max-width: 700px;
+            margin: 80px auto;
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        h2 {
+            margin-bottom: 20px;
+        }
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .action-btn {
+            background-color: #007bff;
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        .action-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Welcome to Your Dashboard</h2>
+        <p>You can say: <strong>"compose"</strong>, <strong>"inbox"</strong>, or <strong>"logout"</strong></p>
+
+        <div class="actions">
+            <form action="{{ url_for('compose') }}">
+                <button class="action-btn">📧 Compose Mail</button>
+            </form>
+            <form action="{{ url_for('inbox') }}">
+                <button class="action-btn">📥 Inbox</button>
+            </form>
+            <form action="{{ url_for('logout') }}">
+                <button class="action-btn">🚪 Logout</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Global voice command handler
+        window.onload = function () {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.continuous = true;
+            recognition.lang = 'en-US';
+
+            recognition.onresult = function (event) {
+                const command = event.results[event.results.length - 1][0].transcript.toLowerCase();
+                console.log("Voice command:", command);
+
+                if (command.includes("compose")) {
+                    window.location.href = "{{ url_for('compose') }}";
+                } else if (command.includes("inbox")) {
+                    window.location.href = "{{ url_for('inbox') }}";
+                } else if (command.includes("logout")) {
+                    window.location.href = "{{ url_for('logout') }}";
+                }
+            };
+
+            recognition.onerror = function (event) {
+                console.error("Speech recognition error:", event.error);
+            };
+
+            recognition.start();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Inbox</title>
+    <link rel="stylesheet" href="static/styles.css">
+    <style>
+        body {
+            background-image: url('static/images/bg-inbox.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+        }
+        .container {
+            background-color: rgba(0, 0, 0, 0.6);
+            max-width: 900px;
+            margin: 80px auto;
+            padding: 30px;
+            border-radius: 12px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .email-card {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            margin-top: 20px;
+            transition: 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Your Inbox</h2>
+
+    <div class="email-card">
+        <p><strong>From:</strong> alice@example.com</p>
+        <p><strong>Subject:</strong> Meeting Reminder</p>
+        <p>Please don't forget our meeting at 10 AM tomorrow.</p>
+    </div>
+
+    <div class="email-card">
+        <p><strong>From:</strong> bob@example.com</p>
+        <p><strong>Subject:</strong> Project Update</p>
+        <p>The project is going well. I’ll send the final report by Monday.</p>
+    </div>
+
+    <a href="dashboard.html" class="btn">⬅ Back</a>
+</div>
+
+<script>
+    const synth = window.speechSynthesis;
+    const messages = [
+        "Email from Alice at example dot com. Subject: Meeting Reminder. Message: Please don't forget our meeting at 10 AM tomorrow.",
+        "Email from Bob at example dot com. Subject: Project Update. Message: The project is going well. I’ll send the final report by Monday."
+    ];
+
+    let index = 0;
+    let isSpeaking = false;
+
+    function speakNext() {
+        if (index < messages.length) {
+            const utterance = new SpeechSynthesisUtterance(messages[index]);
+            utterance.onend = () => {
+                index++;
+                speakNext();
+            };
+            isSpeaking = true;
+            synth.speak(utterance);
+        } else {
+            isSpeaking = false;
+        }
+    }
+
+    function stopSpeaking() {
+        synth.cancel();
+        isSpeaking = false;
+    }
+
+    window.onload = function () {
+        speakNext();
+
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.continuous = true;
+        recognition.lang = 'en-US';
+
+        recognition.onresult = function (event) {
+            const transcript = event.results[event.results.length - 1][0].transcript.toLowerCase();
+            console.log("Heard:", transcript);
+
+            if (transcript.includes("back")) {
+                stopSpeaking();
+                window.location.href = "dashboard.html";
+            } else if (transcript.includes("read again")) {
+                stopSpeaking();
+                index = 0;
+                speakNext();
+            } else if (transcript.includes("stop")) {
+                stopSpeaking();
+            }
+        };
+
+        recognition.onerror = function (event) {
+            console.error("Speech recognition error:", event.error);
+        };
+
+        recognition.start();
+    };
+</script>
+</body>
+</html>
